@@ -262,6 +262,10 @@ namespace esphome
 
         DecodeResult Packet::decode(std::vector<uint8_t> &data)
         {
+            if (data.size() < 3)
+            {
+                return {DecodeResultType::Fill};
+            }
             const uint16_t size = (uint16_t)data[1] << 8 | (uint16_t)data[2];
 
             if (data.size() < 4)

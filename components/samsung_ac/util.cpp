@@ -23,7 +23,9 @@ namespace esphome
 
         std::string bytes_to_hex(const std::vector<uint8_t> &data, uint16_t start, uint16_t end)
         {
-
+            if (start > data.size() || end > data.size() || start > end) {
+                return "";
+            }
             std::string str;
             str.reserve((end - start) * 2); // Memory reservations are made to increase efficiency.
             for (uint16_t i = start; i < end; i++)

@@ -184,6 +184,7 @@ namespace esphome
             void publish_request(MessageTarget *target, const std::string &address, ProtocolRequest &request) override;
             void protocol_update(MessageTarget *target) override;
         protected:
+            void build_packet_from_request(Packet& packet, const ProtocolRequest& request);
             std::map<std::string, ProtocolRequest> outgoing_queue_; // std::string address -> ProtocolRequest
         };
 

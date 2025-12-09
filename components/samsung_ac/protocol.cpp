@@ -35,8 +35,8 @@ namespace esphome
         // to the data vector. One by one.
         DecodeResult process_data(std::vector<uint8_t> &data, MessageTarget *target)
         {
-            if (*data.begin() != 0x32)
-                return { DecodeResultType::Discard, skip_data(data, 0) };
+            if (data.empty() || *data.begin() != 0x32)
+                return { DecodeResultType::Discard, data.empty() ? 0 : skip_data(data, 0) };
 
 
             DecodeResult  result = { DecodeResultType::Fill, 0 };

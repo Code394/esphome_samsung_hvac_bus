@@ -26,7 +26,7 @@ namespace esphome
 
             std::string str;
             str.reserve((end - start) * 2); // Memory reservations are made to increase efficiency.
-            for (int i = start; i < end; i++)
+            for (uint16_t i = start; i < end; i++)
             {
                 char buf[3];
                 snprintf(buf, sizeof(buf), "%02x", data[i]);

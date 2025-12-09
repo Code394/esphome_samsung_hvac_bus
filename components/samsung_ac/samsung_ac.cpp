@@ -191,10 +191,12 @@ namespace esphome
         LOG_RAW(now-last_transmission_, data_, 0, result.bytes);
       }
 
-      if (result.bytes == data_.size())
+      if (result.bytes > data_.size()) {
+        LOGE("Invalid byte count from decoder: %d > %d", result.bytes, data_.size());
         data_.clear();
-      else
-      {
+      } else if (result.bytes == data_.size()) {
+        data_.clear();
+      } else {
         std::move(data_.begin() + result.bytes, data_.end(), data_.begin());
         data_.resize(data_.size() - result.bytes);
       }

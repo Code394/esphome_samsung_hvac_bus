@@ -479,7 +479,7 @@ namespace esphome
                 }
 
                 if (packet.messages.size() == 0)
-                    return;
+                    continue;
 
                 LOG_PACKET_SEND("Publish packet", packet);
 

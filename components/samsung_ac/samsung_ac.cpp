@@ -101,7 +101,7 @@ namespace esphome
         LOG_RAW_SEND(now-last_transmission_, data);
         last_transmission_ = now;
         this->before_write();
-        this->write_array(data);
+        this->write_array(std::move(data));
         this->flush();
         this->after_write();
         return;

@@ -218,7 +218,7 @@ namespace esphome
         return true;
       }
 
-      if (now-last_transmission_ > silenceInterval && senddata->nextRetry < now)
+      if (now-last_transmission_ > silenceInterval && (int32_t)(now - senddata->nextRetry) >= 0)
       {
         if (senddata->nextRetry > 0){
           LOGW("Retry sending packet %d", senddata->id);

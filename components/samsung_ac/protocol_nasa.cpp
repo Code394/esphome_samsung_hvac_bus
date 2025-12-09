@@ -191,7 +191,7 @@ namespace esphome
                 }
                 break;
             default:
-                LOGE("Unkown type");
+                LOGE("Unknown type");
             }
         }
 

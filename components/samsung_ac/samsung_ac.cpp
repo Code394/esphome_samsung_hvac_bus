@@ -186,7 +186,7 @@ namespace esphome
           return false;
         LOG_RAW_DISCARDED(now-last_transmission_, data_, 0, result.bytes);
       }
-      else
+      else if (result.type == DecodeResultType::Processed)
       {
         LOG_RAW(now-last_transmission_, data_, 0, result.bytes);
       }

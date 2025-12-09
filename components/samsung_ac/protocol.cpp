@@ -21,7 +21,14 @@ namespace esphome
             // and that one new proper packet will continue with the next data read
 
             // find next value of 0x32, and retry with that one
-            return std::find(data.begin() + from, data.end(), 0x32) - data.begin();
+            if (from < 0 || static_cast<size_t>(from) >= data.size()) {
+                return data.size();
+            }
+            auto it = std::find(data.begin() + from, data.end(), 0x32);
+            if (it == data.end()) {
+                return data.size();
+            }
+            return static_cast<uint16_t>(it - data.begin());
         }
 
         // This functions is designed to run after a new value was added

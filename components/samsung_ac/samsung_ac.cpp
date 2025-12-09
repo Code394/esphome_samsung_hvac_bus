@@ -120,9 +120,13 @@ namespace esphome
     {
         if (!send_queue_.empty())
         {
-          auto senddata = &send_queue_.front();
-          if (senddata->id == id) {
-            send_queue_.pop_front();
+          // Search the entire queue for a matching id
+          auto it = std::find_if(send_queue_.begin(), send_queue_.end(),
+                                 [id](const OutgoingData &data) { return data.id == id; });
+          if (it != send_queue_.end()) {
+            send_queue_.erase(it);
+          } else {
+            LOGW("ACK received for unknown packet id: %d", id);
           }
         }
     }

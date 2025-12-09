@@ -212,7 +212,7 @@ namespace esphome
       auto senddata = &send_queue_.front();
 
       const uint32_t now = millis();
-      if (senddata->timeout <= now && senddata->retries >= minRetries) {
+      if (((now - senddata->timeout) < 0x80000000U) && senddata->retries >= minRetries) {
         LOGE("Packet sending timeout %d after %d retries", senddata->id, senddata->retries);
         send_queue_.pop_front();
         return true;

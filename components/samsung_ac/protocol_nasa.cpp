@@ -254,9 +254,9 @@ namespace esphome
             packet.command.packetInformation = true;
             packet.command.packetType = PacketType::Normal;
             packet.command.dataType = dataType;
-            if (_packetCounter == 0)
-                _packetCounter++; // skip 0
-            packet.command.packetNumber = _packetCounter++;
+            // Increment and wrap _packetCounter in the range 1-255 (never zero)
+            _packetCounter = (_packetCounter % 255) + 1;
+            packet.command.packetNumber = _packetCounter;
             return packet;
         }
 

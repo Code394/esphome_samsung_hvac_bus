@@ -191,7 +191,7 @@ namespace esphome
                 }
                 break;
             default:
-                LOGE("Unkown type");
+                LOGE("Unknown type");
             }
         }
 
@@ -254,14 +254,18 @@ namespace esphome
             packet.command.packetInformation = true;
             packet.command.packetType = PacketType::Normal;
             packet.command.dataType = dataType;
-            if (_packetCounter == 0)
-                _packetCounter++; // skip 0
-            packet.command.packetNumber = _packetCounter++;
+            // Increment and wrap _packetCounter in the range 1-255 (never zero)
+            _packetCounter = (_packetCounter % 255) + 1;
+            packet.command.packetNumber = _packetCounter;
             return packet;
         }
 
         DecodeResult Packet::decode(std::vector<uint8_t> &data)
         {
+            if (data.size() < 3)
+            {
+                return {DecodeResultType::Fill};
+            }
             const uint16_t size = (uint16_t)data[1] << 8 | (uint16_t)data[2];
 
             if (data.size() < 4)
@@ -475,7 +479,7 @@ namespace esphome
                 }
 
                 if (packet.messages.size() == 0)
-                    return;
+                    continue;
 
                 LOG_PACKET_SEND("Publish packet", packet);
 

@@ -101,7 +101,7 @@ namespace esphome
         LOG_RAW_SEND(now-last_transmission_, data);
         last_transmission_ = now;
         this->before_write();
-        this->write_array(data);
+        this->write_array(std::move(data));
         this->flush();
         this->after_write();
         return;
@@ -120,9 +120,13 @@ namespace esphome
     {
         if (!send_queue_.empty())
         {
-          auto senddata = &send_queue_.front();
-          if (senddata->id == id) {
-            send_queue_.pop_front();
+          // Search the entire queue for a matching id
+          auto it = std::find_if(send_queue_.begin(), send_queue_.end(),
+                                 [id](const OutgoingData &data) { return data.id == id; });
+          if (it != send_queue_.end()) {
+            send_queue_.erase(it);
+          } else {
+            LOGW("ACK received for unknown packet id: %d", id);
           }
         }
     }
@@ -182,15 +186,17 @@ namespace esphome
           return false;
         LOG_RAW_DISCARDED(now-last_transmission_, data_, 0, result.bytes);
       }
-      else
+      else if (result.type == DecodeResultType::Processed)
       {
         LOG_RAW(now-last_transmission_, data_, 0, result.bytes);
       }
 
-      if (result.bytes == data_.size())
+      if (result.bytes > data_.size()) {
+        LOGE("Invalid byte count from decoder: %d > %d", result.bytes, data_.size());
         data_.clear();
-      else
-      {
+      } else if (result.bytes == data_.size()) {
+        data_.clear();
+      } else {
         std::move(data_.begin() + result.bytes, data_.end(), data_.begin());
         data_.resize(data_.size() - result.bytes);
       }
@@ -206,13 +212,13 @@ namespace esphome
       auto senddata = &send_queue_.front();
 
       const uint32_t now = millis();
-      if (senddata->timeout <= now && senddata->retries >= minRetries) {
+      if (((now - senddata->timeout) < 0x80000000U) && senddata->retries >= minRetries) {
         LOGE("Packet sending timeout %d after %d retries", senddata->id, senddata->retries);
         send_queue_.pop_front();
         return true;
       }
 
-      if (now-last_transmission_ > silenceInterval && senddata->nextRetry < now)
+      if (now-last_transmission_ > silenceInterval && (int32_t)(now - senddata->nextRetry) >= 0)
       {
         if (senddata->nextRetry > 0){
           LOGW("Retry sending packet %d", senddata->id);
